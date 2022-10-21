@@ -16,7 +16,7 @@ const keyGenerator = (): string => {
 export const useKey = (): IUseKey => {
   const usedKeys = React.useRef<Array<string>>([]);
 
-  const generateKey = (): string => {
+  const generateKey = React.useCallback((): string => {
     let foundUniqueKey = false;
     let newKey = '';
     let tries = 0;
@@ -38,12 +38,12 @@ export const useKey = (): IUseKey => {
 
     usedKeys.current.push(newKey);
     return newKey;
-  };
+  }, []);
 
   // Removes our key to make it 'available' again
-  const removeKey = (key: string): void => {
+  const removeKey = React.useCallback((key: string): void => {
     usedKeys.current = usedKeys.current.filter(k => k !== key);
-  };
+  }, []);
 
   return { generateKey, removeKey };
 };

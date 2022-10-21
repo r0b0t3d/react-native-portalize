@@ -19,16 +19,16 @@ export const Context = React.createContext<IProvider | null>(null);
 
 export const Host = ({ children, style }: IHostProps): JSX.Element => {
   const managerRef = React.useRef<IManagerHandles>(null);
-  const queue: {
+  const queue = useRef<{
     type: 'mount' | 'update' | 'unmount';
     key: string;
     children?: React.ReactNode;
-  }[] = [];
+  }[]>([]);
   const { generateKey, removeKey } = useKey();
 
   React.useEffect(() => {
-    while (queue.length && managerRef.current) {
-      const action = queue.pop();
+    while (queue.current.length && managerRef.current) {
+      const action = queue.current.pop();
 
       if (action) {
         switch (action.type) {
@@ -46,46 +46,52 @@ export const Host = ({ children, style }: IHostProps): JSX.Element => {
     }
   }, []);
 
-  const mount = (children: React.ReactNode): string => {
+  const mount = React.useCallback((children: React.ReactNode): string => {
     const key = generateKey();
 
     if (managerRef.current) {
       managerRef.current.mount(key, children);
     } else {
-      queue.push({ type: 'mount', key, children });
+      queue.current.push({ type: 'mount', key, children });
     }
 
     return key;
-  };
+  }, []);
 
-  const update = (key: string, children: React.ReactNode): void => {
+  const update = React.useCallback((key: string, children: React.ReactNode): void => {
     if (managerRef.current) {
       managerRef.current.update(key, children);
     } else {
       const op = { type: 'mount' as 'mount', key, children };
-      const index = queue.findIndex(
+      const index = queue.current.findIndex(
         o => o.type === 'mount' || (o.type === 'update' && o.key === key),
       );
 
       if (index > -1) {
-        queue[index] = op;
+        queue.current[index] = op;
       } else {
-        queue.push(op);
+        queue.current.push(op);
       }
     }
-  };
+  }, []);
 
-  const unmount = (key: string): void => {
+  const unmount = React.useCallback((key: string): void => {
     if (managerRef.current) {
       managerRef.current.unmount(key);
       removeKey(key);
     } else {
-      queue.push({ type: 'unmount', key });
+      queue.current.push({ type: 'unmount', key });
     }
-  };
+  }, [removeKey]);
+
+  const context = React.useMemo(() => ({
+    mount,
+    update,
+    unmount
+  }), [mount, update, unmount])
 
   return (
-    <Context.Provider value={{ mount, update, unmount }}>
+    <Context.Provider value={context}>
       <View style={[{ flex: 1 }, style]} collapsable={false} pointerEvents="box-none">
         {children}
       </View>
