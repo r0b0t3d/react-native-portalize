@@ -2,8 +2,7 @@
   "name": "react-native-portalize",
   "version": "1.0.7",
   "description": "Render anything on top of the rest",
-  "main": "lib/index.js",
-  "types": "./lib/index.d.ts",
+  "main": "src/index",
   "scripts": {
     "build": "rm -rf ./lib/* && yarn lint && tsc",
     "prepare": "yarn build",

@@ -19,7 +19,7 @@ export const Context = React.createContext<IProvider | null>(null);
 
 export const Host = ({ children, style }: IHostProps): JSX.Element => {
   const managerRef = React.useRef<IManagerHandles>(null);
-  const queue = useRef<{
+  const queue = React.useRef<{
     type: 'mount' | 'update' | 'unmount';
     key: string;
     children?: React.ReactNode;
