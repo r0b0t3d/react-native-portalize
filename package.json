@@ -76,5 +76,8 @@
   "peerDependencies": {
     "react": "> 15.0.0",
     "react-native": "> 0.50.0"
-  }
+  },
+  "files": [
+    "src"
+  ]
 }
