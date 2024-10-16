@@ -10,16 +10,11 @@ interface IConsumerProps {
 export const Consumer = ({ children, manager }: IConsumerProps): null => {
   const key = React.useRef<string | undefined>(undefined);
 
-  const checkManager = (): void => {
+  const checkManager = React.useCallback((): void => {
     if (!manager) {
       throw new Error('No portal manager defined');
     }
-  };
-
-  const handleInit = (): void => {
-    checkManager();
-    key.current = manager?.mount(children);
-  };
+  }, [manager]);
 
   React.useEffect(() => {
     checkManager();
@@ -27,6 +22,10 @@ export const Consumer = ({ children, manager }: IConsumerProps): null => {
   }, [children, manager]);
 
   React.useEffect(() => {
+    const handleInit = (): void => {
+      checkManager();
+      key.current = manager?.mount(children);
+    };
     handleInit();
 
     return (): void => {

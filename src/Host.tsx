@@ -3,6 +3,7 @@ import { View, ViewStyle } from 'react-native';
 
 import { useKey } from './hooks/useKey';
 import { Manager, IManagerHandles } from './Manager';
+import { useMemo } from 'react'
 
 interface IHostProps {
   children: React.ReactNode;
@@ -90,9 +91,11 @@ export const Host = ({ children, style }: IHostProps): JSX.Element => {
     unmount
   }), [mount, update, unmount])
 
+  const contentContainerStyle = useMemo(() => [{ flex: 1 }, style], [style]);
+
   return (
     <Context.Provider value={context}>
-      <View style={[{ flex: 1 }, style]} collapsable={false} pointerEvents="box-none">
+      <View style={contentContainerStyle} collapsable={false} pointerEvents="box-none">
         {children}
       </View>
 
